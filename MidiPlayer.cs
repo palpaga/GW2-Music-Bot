@@ -102,12 +102,45 @@ namespace Gw2MusicBot
 
                 if (rawNotes.Count == 0) return;
 
+                int transposeOffset = 0;
+                if (ConfigManager.Config.KeyBinds.DisableFunctionKeys)
+                {
+                    // Auto-transpose the entire track to minimize sharps/flats (diatonic scale adaptation)
+                    int bestOffset = 0;
+                    int minAccidentals = int.MaxValue;
+
+                    for (int i = -5; i <= 6; i++)
+                    {
+                        int accidentals = 0;
+                        foreach (var n in rawNotes)
+                        {
+                            int noteInOctave = ((n.NoteNumber + i) % 12 + 12) % 12; // ensure positive modulo
+                            if (noteInOctave == 1 || noteInOctave == 3 || noteInOctave == 6 || noteInOctave == 8 || noteInOctave == 10)
+                            {
+                                accidentals++;
+                            }
+                        }
+                        
+                        // We also want to prefer transpositions that stay closer to the original pitch
+                        // So if we have equal accidentals, we pick the one closer to 0
+                        if (accidentals < minAccidentals || (accidentals == minAccidentals && Math.Abs(i) < Math.Abs(bestOffset)))
+                        {
+                            minAccidentals = accidentals;
+                            bestOffset = i;
+                        }
+                    }
+                    transposeOffset = bestOffset;
+                    System.Diagnostics.Debug.WriteLine($"Auto-transposing by {transposeOffset} semitones to minimize accidentals.");
+                }
+
                 var noteEvents = new List<Gw2NoteEvent>();
 
                 // 2. Extract all notes allowing polyphony on the same octave
                 foreach (var rn in rawNotes)
                 {
-                    var gw2n = NoteMapper.GetGw2NoteFromMidi(rn.NoteNumber);
+                    var gw2n = NoteMapper.GetGw2NoteFromMidi(rn.NoteNumber + transposeOffset);
+                    if (gw2n == null) continue; // Skip if it still falls on an unplayable accidental
+
                     noteEvents.Add(new Gw2NoteEvent
                     {
                         TimeMs = rn.TimeMs,

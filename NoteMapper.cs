@@ -10,19 +10,21 @@ namespace Gw2MusicBot
 
     public static class NoteMapper
     {
-        public static Gw2Note GetGw2NoteFromMidi(int midiNoteNumber)
+        public static Gw2Note? GetGw2NoteFromMidi(int midiNoteNumber)
         {
             // MIDI Note 60 is C4 (Middle C)
-            int noteInOctave = midiNoteNumber % 12;
+            int noteInOctave = ((midiNoteNumber % 12) + 12) % 12; // ensure positive modulo
             int octave = (midiNoteNumber / 12) - 1;
 
             // Mapping for the Piano (and other chromatic instruments)
             if (ConfigManager.Config.KeyBinds.DisableFunctionKeys)
             {
-                // Map sharp notes to their natural counterpart (e.g. C# -> C)
+                // We've already auto-transposed to minimize accidentals,
+                // but if there are still passing accidentals, we just skip them
+                // because playing a flattened note often sounds worse than a rest.
                 if (noteInOctave == 1 || noteInOctave == 3 || noteInOctave == 6 || noteInOctave == 8 || noteInOctave == 10)
                 {
-                    noteInOctave--;
+                    return null; // Skip unplayable accidental note
                 }
             }
             
