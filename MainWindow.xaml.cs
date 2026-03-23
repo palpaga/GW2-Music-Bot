@@ -62,6 +62,8 @@ public partial class MainWindow : Window
         TxtOctUp.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveUp).ToString();
         TxtStop.Text = KeyInterop.KeyFromVirtualKey(binds.StopPlayback).ToString();
         
+        TxtOctaveDelay.Text = binds.OctaveChangeDelayMs.ToString();
+
         ChkDisableFKeys.Checked -= ChkDisableFKeys_Changed;
         ChkDisableFKeys.Unchecked -= ChkDisableFKeys_Changed;
         ChkDisableFKeys.IsChecked = binds.DisableFunctionKeys;
@@ -286,6 +288,21 @@ public partial class MainWindow : Window
     {
         ConfigManager.Config.KeyBinds.RestrictToTwoOctaves = ChkTwoOctaves.IsChecked == true;
         ConfigManager.Save();
+    }
+
+    private void BtnSaveDelay_Click(object sender, RoutedEventArgs e)
+    {
+        if (int.TryParse(TxtOctaveDelay.Text, out int delay) && delay >= 0)
+        {
+            ConfigManager.Config.KeyBinds.OctaveChangeDelayMs = delay;
+            ConfigManager.Save();
+            MessageBox.Show($"Octave delay saved: {delay}ms", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            MessageBox.Show("Please enter a valid positive number for the delay.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            TxtOctaveDelay.Text = ConfigManager.Config.KeyBinds.OctaveChangeDelayMs.ToString();
+        }
     }
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

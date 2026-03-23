@@ -13,6 +13,7 @@ namespace Gw2MusicBot
         public ushort StopPlayback { get; set; } = 0x1B; // ESC
         public bool DisableFunctionKeys { get; set; } = true;
         public bool RestrictToTwoOctaves { get; set; } = false;
+        public int OctaveChangeDelayMs { get; set; } = 15;
     }
 
     public class AppConfig

@@ -242,6 +242,11 @@ namespace Gw2MusicBot
                                 break;
                             }
 
+                            if (ConfigManager.Config.KeyBinds.OctaveChangeDelayMs > 0)
+                            {
+                                Thread.Sleep(ConfigManager.Config.KeyBinds.OctaveChangeDelayMs);
+                            }
+
                             if (targetOctave > _currentOctave)
                             {
                                 InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveUp);
