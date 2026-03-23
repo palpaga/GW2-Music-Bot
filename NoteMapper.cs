@@ -6,8 +6,6 @@ namespace Gw2MusicBot
     {
         public ushort KeyToPress { get; set; }
         public int Octave { get; set; } // 3 = Low, 4 = Mid, 5 = High
-        public ushort? AlternateKey { get; set; }
-        public int? AlternateOctave { get; set; }
     }
 
     public static class NoteMapper
@@ -46,21 +44,8 @@ namespace Gw2MusicBot
 
             var gw2Note = new Gw2Note { KeyToPress = key, Octave = octave };
 
-            // Optimization for high C (Do2)
-            if (noteInOctave == 0)
-            {
-                gw2Note.AlternateKey = ConfigManager.Config.KeyBinds.HighC;
-                gw2Note.AlternateOctave = octave - 1;
-            }
-
             if (gw2Note.Octave < 1) gw2Note.Octave = 1;
             if (gw2Note.Octave > 3) gw2Note.Octave = 3;
-
-            if (gw2Note.AlternateOctave.HasValue)
-            {
-                if (gw2Note.AlternateOctave < 1) gw2Note.AlternateOctave = 1;
-                if (gw2Note.AlternateOctave > 3) gw2Note.AlternateOctave = 3;
-            }
 
             return gw2Note;
         }
