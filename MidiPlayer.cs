@@ -252,9 +252,6 @@ namespace Gw2MusicBot
                                 InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveDown);
                                 _currentOctave--;
                             }
-                            
-                            // We leave strict time for the GW2 bar to change (50ms)
-                            Thread.Sleep(10);
                         }
 
                         // 2. Play all notes of the chord on this octave at the same time
