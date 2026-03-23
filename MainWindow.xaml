@@ -68,26 +68,88 @@
                         <StackPanel>
                             <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" Margin="5,0,0,10" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
                             
-                            <UniformGrid Columns="4" Margin="0,0,0,5">
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="C:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote0" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_0" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="C#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote1" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_1" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="D:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote2" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_2" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="D#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote3" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_3" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="E:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote4" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_4" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="F:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote5" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_5" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="F#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote6" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_6" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="G:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote7" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_7" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="G#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote8" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_8" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="A:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote9" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_9" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="A#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote10" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_10" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="B:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote11" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_11" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                            </UniformGrid>
-                            
-                            <UniformGrid Columns="3" Margin="0,5,0,0">
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Oct - :" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtOctDown" Width="45" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Oct + :" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtOctUp" Width="45" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Stop:" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtStop" Width="60" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Foreground="DarkRed" Padding="2"/></StackPanel>
-                            </UniformGrid>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Top Row (Sharp / Flat Notes = Function keys) -->
+                                <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Do#" Foreground="DarkSlateGray" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtNote1" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_1" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Ré#" Foreground="DarkSlateGray" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtNote3" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_3" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Fa#" Foreground="DarkSlateGray" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtNote6" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_6" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Sol#" Foreground="DarkSlateGray" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtNote8" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_8" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="5" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="La#" Foreground="DarkSlateGray" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtNote10" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_10" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+
+                                <!-- Bottom Row (Natural Notes & Controls) -->
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="2">
+                                    <TextBlock Text="Do" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote0" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_0" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="2">
+                                    <TextBlock Text="Ré" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote2" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_2" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2" Margin="2">
+                                    <TextBlock Text="Mi" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote4" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_4" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="3" Margin="2">
+                                    <TextBlock Text="Fa" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote5" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_5" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="4" Margin="2">
+                                    <TextBlock Text="Sol" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote7" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_7" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="5" Margin="2">
+                                    <TextBlock Text="La" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote9" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_9" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="6" Margin="2">
+                                    <TextBlock Text="Si" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtNote11" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_11" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="7" Margin="2">
+                                    <TextBlock Text="Oct -" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
+                                    <TextBox Name="TxtOctDown" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="8" Margin="2">
+                                    <TextBlock Text="Oct +" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
+                                    <TextBox Name="TxtOctUp" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="9" Margin="2">
+                                    <TextBlock Text="Stop" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkRed"/>
+                                    <TextBox Name="TxtStop" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Padding="2" Foreground="DarkRed"/>
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </Border>
                 </Expander>
