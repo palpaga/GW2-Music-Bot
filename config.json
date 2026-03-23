@@ -71,6 +71,12 @@
       "Checksum": "a403e8342f74a26bd9b64f2e9eccc3be",
       "SourceUrl": "",
       "Score": 88
+    },
+    {
+      "Name": "John Lennon - Imagine - Fixed - Edit by Sumner.mid",
+      "Checksum": "6c5d6ea6edccd94c726269f21fd9d603",
+      "SourceUrl": "",
+      "Score": 100
     }
   ],
   "KeyBinds": {
@@ -93,7 +99,7 @@
     "OctaveUp": 48,
     "StopPlayback": 27,
     "DisableFunctionKeys": false,
-    "RestrictToTwoOctaves": false,
-    "OctaveChangeDelayMs": 5
+    "RestrictToTwoOctaves": true,
+    "OctaveChangeDelayMs": 0
   }
 }

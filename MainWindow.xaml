@@ -61,14 +61,23 @@
                     <TextBlock Text="Reduces octave switching. Helps prevent the game from dropping notes and desyncing into chord modes on very fast songs." FontSize="10" Foreground="Gray" Margin="20,0,0,10" TextWrapping="Wrap"/>
 
                     <Grid Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Delay before an octave change (ms) :" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                        <TextBox Name="TxtOctaveDelay" Grid.Column="1" Width="40" TextAlignment="Right" VerticalContentAlignment="Center" Margin="5,0"/>
-                        <Button Name="BtnSaveDelay" Grid.Column="2" Content="Save" Padding="10,2" Click="BtnSaveDelay_Click"/>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Delay before an octave change (ms) :" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox Name="TxtOctaveDelay" Grid.Row="0" Grid.Column="1" Width="40" TextAlignment="Right" VerticalContentAlignment="Center" Margin="5,0,5,5"/>
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Minimum delay before each note (ms) :" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                        <TextBox Name="TxtNoteDelay" Grid.Row="1" Grid.Column="1" Width="40" TextAlignment="Right" VerticalContentAlignment="Center" Margin="5,0"/>
+                        
+                        <Button Name="BtnSaveDelay" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Content="Save" Padding="10,0" Click="BtnSaveDelay_Click"/>
                     </Grid>
                 </StackPanel>
 

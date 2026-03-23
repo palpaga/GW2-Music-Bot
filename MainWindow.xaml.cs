@@ -63,6 +63,7 @@ public partial class MainWindow : Window
         TxtStop.Text = KeyInterop.KeyFromVirtualKey(binds.StopPlayback).ToString();
         
         TxtOctaveDelay.Text = binds.OctaveChangeDelayMs.ToString();
+        TxtNoteDelay.Text = binds.NoteDelayMs.ToString();
 
         ChkDisableFKeys.Checked -= ChkDisableFKeys_Changed;
         ChkDisableFKeys.Unchecked -= ChkDisableFKeys_Changed;
@@ -292,16 +293,21 @@ public partial class MainWindow : Window
 
     private void BtnSaveDelay_Click(object sender, RoutedEventArgs e)
     {
-        if (int.TryParse(TxtOctaveDelay.Text, out int delay) && delay >= 0)
+        bool octValid = int.TryParse(TxtOctaveDelay.Text, out int octDelay) && octDelay >= 0;
+        bool noteValid = int.TryParse(TxtNoteDelay.Text, out int noteDelay) && noteDelay >= 0;
+
+        if (octValid && noteValid)
         {
-            ConfigManager.Config.KeyBinds.OctaveChangeDelayMs = delay;
+            ConfigManager.Config.KeyBinds.OctaveChangeDelayMs = octDelay;
+            ConfigManager.Config.KeyBinds.NoteDelayMs = noteDelay;
             ConfigManager.Save();
-            MessageBox.Show($"Octave delay saved: {delay}ms", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Delays saved:\nOctave: {octDelay}ms\nNotes: {noteDelay}ms", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
-            MessageBox.Show("Please enter a valid positive number for the delay.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Please enter valid positive numbers for the delays.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             TxtOctaveDelay.Text = ConfigManager.Config.KeyBinds.OctaveChangeDelayMs.ToString();
+            TxtNoteDelay.Text = ConfigManager.Config.KeyBinds.NoteDelayMs.ToString();
         }
     }
 

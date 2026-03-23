@@ -262,6 +262,10 @@ namespace Gw2MusicBot
                         // 2. Play all notes of the chord on this octave at the same time
                         foreach (var note in octGroup)
                         {
+                            if (ConfigManager.Config.KeyBinds.NoteDelayMs > 0)
+                            {
+                                Thread.Sleep(ConfigManager.Config.KeyBinds.NoteDelayMs);
+                            }
                             InputSimulator.PressKey(note.KeyToPress);
                         }
                     }

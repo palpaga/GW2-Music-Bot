@@ -14,6 +14,7 @@ namespace Gw2MusicBot
         public bool DisableFunctionKeys { get; set; } = true;
         public bool RestrictToTwoOctaves { get; set; } = false;
         public int OctaveChangeDelayMs { get; set; } = 15;
+        public int NoteDelayMs { get; set; } = 0;
     }
 
     public class AppConfig
