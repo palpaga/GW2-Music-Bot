@@ -54,7 +54,6 @@
         <GroupBox Grid.Row="3" Header="Player Settings" Margin="0,0,0,10" Padding="5">
             <StackPanel>
                 <StackPanel Margin="0,5,0,0">
-                    <CheckBox Name="ChkGame" Content="Send keys to Game (Turn off to simulate playback internally)" IsChecked="True" Checked="ChkGame_Changed" Unchecked="ChkGame_Changed"/>
                     <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" FontWeight="SemiBold" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed" Margin="0,5,0,0"/>
                     <TextBlock Text="Checked by default. Function keys are only available on the Piano. Other instruments cannot play these notes." FontSize="10" Foreground="Gray" Margin="20,0,0,10" TextWrapping="Wrap"/>
                     

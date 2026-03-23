@@ -234,14 +234,10 @@ public partial class MainWindow : Window
     {
         BtnPlay.Content = "PLAY";
         BtnPlay.IsEnabled = true;
-        // Restore the checkbox setting
-        if (_player != null) _player.EnableGameInput = ChkGame.IsChecked == true;
+        
+        if (_player != null) _player.EnableGameInput = true;
     }
 
-    private void ChkGame_Changed(object sender, RoutedEventArgs e)
-    {
-        if (_player != null) _player.EnableGameInput = ChkGame.IsChecked == true;
-    }
     private void SliderSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (_player != null)
