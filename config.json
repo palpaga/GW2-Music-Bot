@@ -99,7 +99,8 @@
     "OctaveUp": 48,
     "StopPlayback": 27,
     "DisableFunctionKeys": false,
-    "RestrictToTwoOctaves": true,
-    "OctaveChangeDelayMs": 0
+    "RestrictToTwoOctaves": false,
+    "OctaveChangeDelayMs": 5,
+    "NoteDelayMs": 0
   }
 }
