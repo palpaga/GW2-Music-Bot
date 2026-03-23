@@ -57,6 +57,7 @@ public partial class MainWindow : Window
         TxtNote10.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[10]).ToString();
         TxtNote11.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[11]).ToString();
         
+        TxtHighC.Text = KeyInterop.KeyFromVirtualKey(binds.HighC).ToString();
         TxtOctDown.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveDown).ToString();
         TxtOctUp.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveUp).ToString();
         TxtStop.Text = KeyInterop.KeyFromVirtualKey(binds.StopPlayback).ToString();
@@ -264,6 +265,7 @@ public partial class MainWindow : Window
                     ConfigManager.Config.KeyBinds.Notes[index] = vk;
                 }
             }
+            else if (tag == "HighC") ConfigManager.Config.KeyBinds.HighC = vk;
             else if (tag == "OctaveDown") ConfigManager.Config.KeyBinds.OctaveDown = vk;
             else if (tag == "OctaveUp") ConfigManager.Config.KeyBinds.OctaveUp = vk;
             else if (tag == "Stop") ConfigManager.Config.KeyBinds.StopPlayback = vk;

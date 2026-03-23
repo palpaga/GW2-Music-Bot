@@ -84,6 +84,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- Top Row (Sharp / Flat Notes = Function keys) -->
@@ -138,14 +139,18 @@
                                     <TextBox Name="TxtNote11" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_11" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Grid.Column="7" Margin="2">
+                                    <TextBlock Text="Do2" TextAlignment="Center" FontWeight="SemiBold"/>
+                                    <TextBox Name="TxtHighC" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="HighC" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="8" Margin="2">
                                     <TextBlock Text="Oct -" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
                                     <TextBox Name="TxtOctDown" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="8" Margin="2">
+                                <StackPanel Grid.Row="1" Grid.Column="9" Margin="2">
                                     <TextBlock Text="Oct +" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
                                     <TextBox Name="TxtOctUp" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="9" Margin="2">
+                                <StackPanel Grid.Row="1" Grid.Column="10" Margin="2">
                                     <TextBlock Text="Stop" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkRed"/>
                                     <TextBox Name="TxtStop" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Padding="2" Foreground="DarkRed"/>
                                 </StackPanel>

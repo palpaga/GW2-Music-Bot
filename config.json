@@ -91,6 +91,6 @@
     "OctaveDown": 57,
     "OctaveUp": 48,
     "StopPlayback": 27,
-    "DisableFunctionKeys": true
+    "DisableFunctionKeys": false
   }
 }

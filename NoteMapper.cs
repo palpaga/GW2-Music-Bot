@@ -6,6 +6,8 @@ namespace Gw2MusicBot
     {
         public ushort KeyToPress { get; set; }
         public int Octave { get; set; } // 3 = Low, 4 = Mid, 5 = High
+        public ushort? AlternateKey { get; set; }
+        public int? AlternateOctave { get; set; }
     }
 
     public static class NoteMapper
@@ -36,16 +38,31 @@ namespace Gw2MusicBot
             // Mode 4: Middle Octave (represented as octave 4)
             // Mode 5: High Octave (represented as octave 5)
             // Mode 6: Major Chords (represented as octave 6)
-            
+
             // For now, we translate normal MIDI notes to the 3 main octaves (1, 2, 3)
             // Octave 1 = Low, Octave 2 = Middle, Octave 3 = High.
             // The -2 generally brings MIDI octave 4 to the middle.
             octave -= 2;
 
-            if (octave < 1) octave = 1;
-            if (octave > 3) octave = 3;
+            var gw2Note = new Gw2Note { KeyToPress = key, Octave = octave };
 
-            return new Gw2Note { KeyToPress = key, Octave = octave };
+            // Optimization for high C (Do2)
+            if (noteInOctave == 0)
+            {
+                gw2Note.AlternateKey = ConfigManager.Config.KeyBinds.HighC;
+                gw2Note.AlternateOctave = octave - 1;
+            }
+
+            if (gw2Note.Octave < 1) gw2Note.Octave = 1;
+            if (gw2Note.Octave > 3) gw2Note.Octave = 3;
+
+            if (gw2Note.AlternateOctave.HasValue)
+            {
+                if (gw2Note.AlternateOctave < 1) gw2Note.AlternateOctave = 1;
+                if (gw2Note.AlternateOctave > 3) gw2Note.AlternateOctave = 3;
+            }
+
+            return gw2Note;
         }
     }
 }

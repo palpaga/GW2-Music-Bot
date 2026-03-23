@@ -16,6 +16,8 @@ namespace Gw2MusicBot
         public int NoteNumber { get; set; }
         public ushort KeyToPress { get; set; }
         public int Octave { get; set; }
+        public ushort? AlternateKey { get; set; }
+        public int? AlternateOctave { get; set; }
     }
 
     public class Gw2MidiPlayer : IDisposable
@@ -146,7 +148,9 @@ namespace Gw2MusicBot
                         TimeMs = rn.TimeMs,
                         NoteNumber = rn.NoteNumber,
                         KeyToPress = gw2n.KeyToPress,
-                        Octave = gw2n.Octave
+                        Octave = gw2n.Octave,
+                        AlternateKey = gw2n.AlternateKey,
+                        AlternateOctave = gw2n.AlternateOctave
                     });
                 }
 
@@ -209,6 +213,19 @@ namespace Gw2MusicBot
 
                     if (token.IsCancellationRequested) break;
                     if (!EnableGameInput) continue;
+
+                    // Optimize octave shifting: prefer the alternate High C if it avoids switching
+                    foreach (var note in group)
+                    {
+                        if (note.AlternateOctave.HasValue && note.AlternateKey.HasValue)
+                        {
+                            if (note.AlternateOctave.Value == _currentOctave)
+                            {
+                                note.Octave = note.AlternateOctave.Value;
+                                note.KeyToPress = note.AlternateKey.Value;
+                            }
+                        }
+                    }
 
                     // Separate the notes of this chord by octave
                     var octaveGroups = group.GroupBy(n => n.Octave).OrderBy(g => g.Key);
