@@ -45,7 +45,15 @@ namespace Gw2MusicBot
             var gw2Note = new Gw2Note { KeyToPress = key, Octave = octave };
 
             if (gw2Note.Octave < 1) gw2Note.Octave = 1;
-            if (gw2Note.Octave > 3) gw2Note.Octave = 3;
+            
+            if (ConfigManager.Config.KeyBinds.RestrictToTwoOctaves)
+            {
+                if (gw2Note.Octave > 2) gw2Note.Octave = 2;
+            }
+            else
+            {
+                if (gw2Note.Octave > 3) gw2Note.Octave = 3;
+            }
 
             return gw2Note;
         }

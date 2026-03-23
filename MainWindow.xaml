@@ -66,7 +66,10 @@
                 <Expander Header="Key Mapping &amp; Shortcuts" Margin="0,10,0,0">
                     <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3" Padding="5" Background="#F9F9F9">
                         <StackPanel>
-                            <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" Margin="5,0,0,10" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
+                            <UniformGrid Columns="2" Margin="5,0,0,10">
+                                <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
+                                <CheckBox Name="ChkTwoOctaves" Content="Restrict to 2 Octaves (Faster playback)" Checked="ChkTwoOctaves_Changed" Unchecked="ChkTwoOctaves_Changed"/>
+                            </UniformGrid>
                             
                             <Grid Margin="0,0,0,5">
                                 <Grid.RowDefinitions>
@@ -109,6 +112,15 @@
                                     <TextBox Name="TxtNote10" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_10" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
                                 </StackPanel>
 
+                                <StackPanel Grid.Row="0" Grid.Column="6" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Oct -" Foreground="DarkBlue" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtOctDown" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="7" HorizontalAlignment="Right" Margin="0,0,-15,2" Panel.ZIndex="1">
+                                    <TextBlock Text="Oct +" Foreground="DarkBlue" TextAlignment="Center" FontSize="10"/>
+                                    <TextBox Name="TxtOctUp" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2" Background="#EEE"/>
+                                </StackPanel>
+
                                 <!-- Bottom Row (Natural Notes & Controls) -->
                                 <StackPanel Grid.Row="1" Grid.Column="0" Margin="2">
                                     <TextBlock Text="Do" TextAlignment="Center" FontWeight="SemiBold"/>
@@ -142,17 +154,9 @@
                                     <TextBlock Text="Do2" TextAlignment="Center" FontWeight="SemiBold"/>
                                     <TextBox Name="TxtHighC" Width="30" PreviewKeyDown="KeyBind_KeyDown" Tag="HighC" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="8" Margin="2">
-                                    <TextBlock Text="Oct -" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
-                                    <TextBox Name="TxtOctDown" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="9" Margin="2">
-                                    <TextBlock Text="Oct +" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkBlue"/>
-                                    <TextBox Name="TxtOctUp" Width="35" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="10" Margin="2">
+                                <StackPanel Grid.Row="1" Grid.Column="8" Margin="2" Grid.ColumnSpan="2">
                                     <TextBlock Text="Stop" TextAlignment="Center" FontWeight="SemiBold" Foreground="DarkRed"/>
-                                    <TextBox Name="TxtStop" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Padding="2" Foreground="DarkRed"/>
+                                    <TextBox Name="TxtStop" Width="60" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Padding="2" Foreground="DarkRed"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>

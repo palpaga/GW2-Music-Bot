@@ -67,6 +67,12 @@ public partial class MainWindow : Window
         ChkDisableFKeys.IsChecked = binds.DisableFunctionKeys;
         ChkDisableFKeys.Checked += ChkDisableFKeys_Changed;
         ChkDisableFKeys.Unchecked += ChkDisableFKeys_Changed;
+
+        ChkTwoOctaves.Checked -= ChkTwoOctaves_Changed;
+        ChkTwoOctaves.Unchecked -= ChkTwoOctaves_Changed;
+        ChkTwoOctaves.IsChecked = binds.RestrictToTwoOctaves;
+        ChkTwoOctaves.Checked += ChkTwoOctaves_Changed;
+        ChkTwoOctaves.Unchecked += ChkTwoOctaves_Changed;
     }
 
     private async void BtnSearch_Click(object sender, RoutedEventArgs e)
@@ -277,6 +283,12 @@ public partial class MainWindow : Window
     private void ChkDisableFKeys_Changed(object sender, RoutedEventArgs e)
     {
         ConfigManager.Config.KeyBinds.DisableFunctionKeys = ChkDisableFKeys.IsChecked == true;
+        ConfigManager.Save();
+    }
+
+    private void ChkTwoOctaves_Changed(object sender, RoutedEventArgs e)
+    {
+        ConfigManager.Config.KeyBinds.RestrictToTwoOctaves = ChkTwoOctaves.IsChecked == true;
         ConfigManager.Save();
     }
 
