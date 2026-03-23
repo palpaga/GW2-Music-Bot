@@ -102,36 +102,50 @@ namespace Gw2MusicBot
 
                 if (rawNotes.Count == 0) return;
 
+                // Auto-transpose the entire track to fit within the playable range and minimize accidentals if needed
                 int transposeOffset = 0;
-                if (ConfigManager.Config.KeyBinds.DisableFunctionKeys)
-                {
-                    // Auto-transpose the entire track to minimize sharps/flats (diatonic scale adaptation)
-                    int bestOffset = 0;
-                    int minAccidentals = int.MaxValue;
+                int bestOffset = 0;
+                int minPenalty = int.MaxValue;
 
-                    for (int i = -5; i <= 6; i++)
+                int maxAllowedOctave = ConfigManager.Config.KeyBinds.RestrictToTwoOctaves ? 2 : 3;
+
+                // Test transpositions from -48 to +48 semitones (4 octaves up/down)
+                for (int i = -48; i <= 48; i++)
+                {
+                    int penalty = 0;
+                    foreach (var n in rawNotes)
                     {
-                        int accidentals = 0;
-                        foreach (var n in rawNotes)
+                        int transposedNote = n.NoteNumber + i;
+                        int noteInOctave = ((transposedNote % 12) + 12) % 12;
+                        
+                        // Penalty for accidentals if function keys are disabled
+                        if (ConfigManager.Config.KeyBinds.DisableFunctionKeys)
                         {
-                            int noteInOctave = ((n.NoteNumber + i) % 12 + 12) % 12; // ensure positive modulo
                             if (noteInOctave == 1 || noteInOctave == 3 || noteInOctave == 6 || noteInOctave == 8 || noteInOctave == 10)
                             {
-                                accidentals++;
+                                penalty += 1000; // Heavy penalty: note will be completely dropped (hole)
                             }
                         }
+
+                        // Penalty for out of range notes
+                        int gw2Octave = (transposedNote / 12) - 1 - 2;
                         
-                        // We also want to prefer transpositions that stay closer to the original pitch
-                        // So if we have equal accidentals, we pick the one closer to 0
-                        if (accidentals < minAccidentals || (accidentals == minAccidentals && Math.Abs(i) < Math.Abs(bestOffset)))
+                        if (gw2Octave < 1 || gw2Octave > maxAllowedOctave)
                         {
-                            minAccidentals = accidentals;
-                            bestOffset = i;
+                            penalty += 1; // Minor penalty: note will be clamped to nearest octave, breaking melody shape
                         }
                     }
-                    transposeOffset = bestOffset;
-                    System.Diagnostics.Debug.WriteLine($"Auto-transposing by {transposeOffset} semitones to minimize accidentals.");
+                    
+                    // Prefer transpositions closer to original pitch if penalties are equal
+                    if (penalty < minPenalty || (penalty == minPenalty && Math.Abs(i) < Math.Abs(bestOffset)))
+                    {
+                        minPenalty = penalty;
+                        bestOffset = i;
+                    }
                 }
+                
+                transposeOffset = bestOffset;
+                System.Diagnostics.Debug.WriteLine($"Auto-transposing by {transposeOffset} semitones. Penalty score: {minPenalty}");
 
                 var noteEvents = new List<Gw2NoteEvent>();
 

@@ -57,6 +57,14 @@
                     <CheckBox Name="ChkGame" Content="Send keys to Game" IsChecked="True" Checked="ChkGame_Changed" Unchecked="ChkGame_Changed"/>
                 </UniformGrid>
 
+                <StackPanel Margin="0,5,0,0">
+                    <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" FontWeight="SemiBold" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
+                    <TextBlock Text="Checked by default. Function keys are only available on the Piano. Other instruments cannot play these notes." FontSize="10" Foreground="Gray" Margin="20,0,0,10" TextWrapping="Wrap"/>
+                    
+                    <CheckBox Name="ChkTwoOctaves" Content="Restrict to 2 Octaves (Faster playback)" FontWeight="SemiBold" Checked="ChkTwoOctaves_Changed" Unchecked="ChkTwoOctaves_Changed"/>
+                    <TextBlock Text="Reduces octave switching. Helps prevent the game from dropping notes and desyncing into chord modes on very fast songs." FontSize="10" Foreground="Gray" Margin="20,0,0,5" TextWrapping="Wrap"/>
+                </StackPanel>
+
                 <Grid Margin="0,10,0,5">
                     <TextBlock Text="Playback Speed:" HorizontalAlignment="Left" />
                     <TextBlock Name="TxtSpeedVal" Text="1.00x" HorizontalAlignment="Right" FontWeight="Bold" />
@@ -66,11 +74,6 @@
                 <Expander Header="Key Mapping &amp; Shortcuts" Margin="0,10,0,0">
                     <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3" Padding="5" Background="#F9F9F9">
                         <StackPanel>
-                            <UniformGrid Columns="2" Margin="5,0,0,10">
-                                <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
-                                <CheckBox Name="ChkTwoOctaves" Content="Restrict to 2 Octaves (Faster playback)" Checked="ChkTwoOctaves_Changed" Unchecked="ChkTwoOctaves_Changed"/>
-                            </UniformGrid>
-                            
                             <Grid Margin="0,0,0,5">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
