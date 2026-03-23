@@ -163,6 +163,14 @@ namespace Gw2MusicBot
                     while (sw.ElapsedMilliseconds < targetTime)
                     {
                         if (token.IsCancellationRequested) break;
+                        
+                        // Check for the user's global stop shortcut (e.g. Escape)
+                        if ((InputSimulator.GetAsyncKeyState(ConfigManager.Config.KeyBinds.StopPlayback) & 0x8000) != 0)
+                        {
+                            Stop();
+                            break;
+                        }
+                        
                         Thread.Sleep(1);
                     }
 
@@ -180,15 +188,21 @@ namespace Gw2MusicBot
                         while (_currentOctave != targetOctave)
                         {
                             if (token.IsCancellationRequested) break;
+                            
+                            if ((InputSimulator.GetAsyncKeyState(ConfigManager.Config.KeyBinds.StopPlayback) & 0x8000) != 0)
+                            {
+                                Stop();
+                                break;
+                            }
 
                             if (targetOctave > _currentOctave)
                             {
-                                InputSimulator.PressKey(InputSimulator.VK_0);
+                                InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveUp);
                                 _currentOctave++;
                             }
                             else
                             {
-                                InputSimulator.PressKey(InputSimulator.VK_9);
+                                InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveDown);
                                 _currentOctave--;
                             }
                             
@@ -221,11 +235,6 @@ namespace Gw2MusicBot
                 _cts = null;
                 PlaybackStopped?.Invoke(this, EventArgs.Empty);
             }
-        }
-
-        public void Pause()
-        {
-            Stop(); // Pause is transformed into stop for this macro version
         }
 
         public void Dispose()

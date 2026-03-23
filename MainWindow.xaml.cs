@@ -30,10 +30,42 @@ public partial class MainWindow : Window
         InitializeComponent();
         _player = new Gw2MidiPlayer();
         _midiService = new BardsGuildService();
-        _favorites = FavoritesManager.LoadFavorites();
+        
+        ConfigManager.Load();
+        _favorites = ConfigManager.Config.Favorites;
+        
+        UpdateKeyBindUI();
         
         _player.PlaybackFinished += (s, e) => Dispatcher.Invoke(() => ResetUI());
         _player.PlaybackStopped += (s, e) => Dispatcher.Invoke(() => ResetUI());
+    }
+
+    private void UpdateKeyBindUI()
+    {
+        var binds = ConfigManager.Config.KeyBinds;
+        
+        TxtNote0.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[0]).ToString();
+        TxtNote1.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[1]).ToString();
+        TxtNote2.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[2]).ToString();
+        TxtNote3.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[3]).ToString();
+        TxtNote4.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[4]).ToString();
+        TxtNote5.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[5]).ToString();
+        TxtNote6.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[6]).ToString();
+        TxtNote7.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[7]).ToString();
+        TxtNote8.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[8]).ToString();
+        TxtNote9.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[9]).ToString();
+        TxtNote10.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[10]).ToString();
+        TxtNote11.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[11]).ToString();
+        
+        TxtOctDown.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveDown).ToString();
+        TxtOctUp.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveUp).ToString();
+        TxtStop.Text = KeyInterop.KeyFromVirtualKey(binds.StopPlayback).ToString();
+        
+        ChkDisableFKeys.Checked -= ChkDisableFKeys_Changed;
+        ChkDisableFKeys.Unchecked -= ChkDisableFKeys_Changed;
+        ChkDisableFKeys.IsChecked = binds.DisableFunctionKeys;
+        ChkDisableFKeys.Checked += ChkDisableFKeys_Changed;
+        ChkDisableFKeys.Unchecked += ChkDisableFKeys_Changed;
     }
 
     private async void BtnSearch_Click(object sender, RoutedEventArgs e)
@@ -63,7 +95,8 @@ public partial class MainWindow : Window
 
     private void BtnShowFavorites_Click(object sender, RoutedEventArgs e)
     {
-        _favorites = FavoritesManager.LoadFavorites();
+        ConfigManager.Load();
+        _favorites = ConfigManager.Config.Favorites;
         LstResults.ItemsSource = null;
         LstResults.ItemsSource = _favorites;
     }
@@ -82,7 +115,7 @@ public partial class MainWindow : Window
                 _favorites.Add(track);
                 btn.Foreground = Brushes.Orange;
             }
-            FavoritesManager.SaveFavorites(_favorites);
+            ConfigManager.Save();
             
             // If we are on the favorites tab, refresh
             if (LstResults.ItemsSource == _favorites)
@@ -132,7 +165,6 @@ public partial class MainWindow : Window
                 
                 TxtFileName.Text = $"Ready: {track.Name}";
                 BtnPlay.IsEnabled = true;
-                BtnPause.IsEnabled = true;
                 BtnStop.IsEnabled = true;
             }
             catch (Exception ex)
@@ -161,7 +193,6 @@ public partial class MainWindow : Window
                 
                 LstResults.SelectedItem = null; // Deselect online list
                 BtnPlay.IsEnabled = true;
-                BtnPause.IsEnabled = true;
                 BtnStop.IsEnabled = true;
             }
             catch (Exception ex)
@@ -173,17 +204,17 @@ public partial class MainWindow : Window
 
     private async void BtnPlay_Click(object sender, RoutedEventArgs e)
     {
-        // Add a small delay so the user has time to click back to the game window
-        BtnPlay.Content = "Playing in 2s...";
-        await System.Threading.Tasks.Task.Delay(2000);
-        BtnPlay.Content = "Playing";
+        BtnPlay.IsEnabled = false;
+        
+        // Countdown from 3
+        for (int i = 3; i > 0; i--)
+        {
+            BtnPlay.Content = $"Playing in {i}...";
+            await System.Threading.Tasks.Task.Delay(1000);
+        }
+        
+        BtnPlay.Content = "PLAYING (Press Stop Shortcut to cancel)";
         _player.Play();
-    }
-
-    private void BtnPause_Click(object sender, RoutedEventArgs e)
-    {
-        _player.Pause();
-        BtnPlay.Content = "Play (Wait 2s)";
     }
 
     private void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -194,7 +225,8 @@ public partial class MainWindow : Window
 
     private void ResetUI()
     {
-        BtnPlay.Content = "Play (Wait 2s)";
+        BtnPlay.Content = "PLAY";
+        BtnPlay.IsEnabled = true;
         // Restore the checkbox setting
         if (_player != null) _player.EnableGameInput = ChkGame.IsChecked == true;
     }
@@ -213,6 +245,37 @@ public partial class MainWindow : Window
         {
             TxtSpeedVal.Text = $"{e.NewValue:F2}x";
         }
+    }
+
+    private void KeyBind_KeyDown(object sender, KeyEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is TextBox tb && tb.Tag is string tag)
+        {
+            Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+            ushort vk = (ushort)KeyInterop.VirtualKeyFromKey(key);
+            
+            tb.Text = key.ToString();
+
+            if (tag.StartsWith("Note_"))
+            {
+                if (int.TryParse(tag.Substring(5), out int index))
+                {
+                    ConfigManager.Config.KeyBinds.Notes[index] = vk;
+                }
+            }
+            else if (tag == "OctaveDown") ConfigManager.Config.KeyBinds.OctaveDown = vk;
+            else if (tag == "OctaveUp") ConfigManager.Config.KeyBinds.OctaveUp = vk;
+            else if (tag == "Stop") ConfigManager.Config.KeyBinds.StopPlayback = vk;
+
+            ConfigManager.Save();
+        }
+    }
+
+    private void ChkDisableFKeys_Changed(object sender, RoutedEventArgs e)
+    {
+        ConfigManager.Config.KeyBinds.DisableFunctionKeys = ChkDisableFKeys.IsChecked == true;
+        ConfigManager.Save();
     }
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -39,5 +39,5 @@ dotnet publish Gw2MusicBot.csproj -c Release -r win-x64 --self-contained true -p
 
 ## Credits
 
-Made with ❤️ by Lama  
+Made with ❤️ by Lama and Gemini 
 Source code: [https://github.com/palpaga/GW2-Music-Bot](https://github.com/palpaga/GW2-Music-Bot)

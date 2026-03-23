@@ -1,11 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace Gw2MusicBot
 {
     public static class InputSimulator
     {
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
+
         [DllImport("user32.dll")]
         private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
@@ -57,7 +59,6 @@ namespace Gw2MusicBot
         }
 
         private const int INPUT_KEYBOARD = 1;
-        private const uint KEYEVENTF_KEYDOWN = 0x0000;
         private const uint KEYEVENTF_KEYUP = 0x0002;
         private const uint KEYEVENTF_SCANCODE = 0x0008;
         private const uint MAPVK_VK_TO_VSC = 0x00;

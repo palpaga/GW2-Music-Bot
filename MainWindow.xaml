@@ -62,20 +62,52 @@
                     <TextBlock Name="TxtSpeedVal" Text="1.00x" HorizontalAlignment="Right" FontWeight="Bold" />
                 </Grid>
                 <Slider Name="SliderSpeed" Minimum="0.1" Maximum="2.0" Value="1.0" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="SliderSpeed_ValueChanged"/>
+                
+                <Expander Header="Key Mapping &amp; Shortcuts" Margin="0,10,0,0">
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3" Padding="5" Background="#F9F9F9">
+                        <StackPanel>
+                            <CheckBox Name="ChkDisableFKeys" Content="Disable Sharp/Flat notes (Ignore F1-F5)" Margin="5,0,0,10" Checked="ChkDisableFKeys_Changed" Unchecked="ChkDisableFKeys_Changed"/>
+                            
+                            <UniformGrid Columns="4" Margin="0,0,0,5">
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="C:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote0" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_0" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="C#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote1" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_1" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="D:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote2" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_2" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="D#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote3" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_3" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="E:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote4" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_4" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="F:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote5" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_5" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="F#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote6" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_6" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="G:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote7" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_7" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="G#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote8" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_8" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="A:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote9" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_9" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="A#:" Width="25" VerticalAlignment="Center" Foreground="DarkSlateGray"/><TextBox Name="TxtNote10" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_10" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="B:" Width="25" VerticalAlignment="Center"/><TextBox Name="TxtNote11" Width="40" PreviewKeyDown="KeyBind_KeyDown" Tag="Note_11" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                            </UniformGrid>
+                            
+                            <UniformGrid Columns="3" Margin="0,5,0,0">
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Oct - :" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtOctDown" Width="45" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveDown" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Oct + :" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtOctUp" Width="45" PreviewKeyDown="KeyBind_KeyDown" Tag="OctaveUp" IsReadOnly="True" TextAlignment="Center" Padding="2"/></StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="2"><TextBlock Text="Stop:" Width="35" VerticalAlignment="Center" FontWeight="SemiBold"/><TextBox Name="TxtStop" Width="60" PreviewKeyDown="KeyBind_KeyDown" Tag="Stop" IsReadOnly="True" TextAlignment="Center" Foreground="DarkRed" Padding="2"/></StackPanel>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                </Expander>
             </StackPanel>
         </GroupBox>
 
         <StackPanel Grid.Row="4">
             <TextBlock Name="TxtFileName" Text="No music selected" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,0,0,10"/>
             
-            <UniformGrid Columns="3" Margin="0,0,0,5">
-                <Button Name="BtnPlay" Content="Play (Wait 2s)" Padding="10" Click="BtnPlay_Click" IsEnabled="False" Background="#FF4CAF50" Foreground="White" FontWeight="Bold"/>
-                <Button Name="BtnPause" Content="Pause" Padding="10" Click="BtnPause_Click" IsEnabled="False"/>
-                <Button Name="BtnStop" Content="Stop" Padding="10" Click="BtnStop_Click" IsEnabled="False"/>
-            </UniformGrid>
+            <Grid Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Name="BtnPlay" Grid.Column="0" Content="PLAY" Padding="10" Click="BtnPlay_Click" IsEnabled="False" Background="#FF4CAF50" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,5,0"/>
+                <Button Name="BtnStop" Grid.Column="1" Content="Stop" Padding="10,0" Width="80" Click="BtnStop_Click" IsEnabled="False"/>
+            </Grid>
             <TextBlock Text="Important: Click on the game window right after pressing Play!" Foreground="DarkRed" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Margin="0,15,0,0" HorizontalAlignment="Center" FontSize="11" Foreground="Gray">
-                Made with ❤️ by Lama -
+                Made with ❤️ by Lama and Google Gemini -
                 <Hyperlink NavigateUri="https://github.com/palpaga/GW2-Music-Bot" RequestNavigate="Hyperlink_RequestNavigate">
                     https://github.com/palpaga/GW2-Music-Bot
                 </Hyperlink>

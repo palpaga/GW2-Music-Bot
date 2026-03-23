@@ -16,25 +16,17 @@ namespace Gw2MusicBot
             int noteInOctave = midiNoteNumber % 12;
             int octave = (midiNoteNumber / 12) - 1;
 
-            ushort key = 0;
-
             // Mapping for the Piano (and other chromatic instruments)
-            // C = 1, C# = F1, D = 2, D# = F2, E = 3, F = 4, F# = F3, G = 5, G# = F4, A = 6, A# = F5, B = 7
-            switch (noteInOctave)
+            if (ConfigManager.Config.KeyBinds.DisableFunctionKeys)
             {
-                case 0:  key = InputSimulator.VK_1; break; // C
-                case 1:  key = InputSimulator.VK_F1; break; // C#
-                case 2:  key = InputSimulator.VK_2; break; // D
-                case 3:  key = InputSimulator.VK_F2; break; // D#
-                case 4:  key = InputSimulator.VK_3; break; // E
-                case 5:  key = InputSimulator.VK_4; break; // F
-                case 6:  key = InputSimulator.VK_F3; break; // F#
-                case 7:  key = InputSimulator.VK_5; break; // G
-                case 8:  key = InputSimulator.VK_F4; break; // G#
-                case 9:  key = InputSimulator.VK_6; break; // A
-                case 10: key = InputSimulator.VK_F5; break; // A#
-                case 11: key = InputSimulator.VK_7; break; // B
+                // Map sharp notes to their natural counterpart (e.g. C# -> C)
+                if (noteInOctave == 1 || noteInOctave == 3 || noteInOctave == 6 || noteInOctave == 8 || noteInOctave == 10)
+                {
+                    noteInOctave--;
+                }
             }
+            
+            ushort key = ConfigManager.Config.KeyBinds.Notes[noteInOctave];
 
             // Adjust octave to correspond to the 5 modes of the GW2 Piano
             // Mode 2: Minor Chords (represented as octave 2)
