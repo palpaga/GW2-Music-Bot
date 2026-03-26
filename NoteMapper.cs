@@ -10,7 +10,7 @@ namespace Gw2MusicBot
 
     public static class NoteMapper
     {
-        public static Gw2Note? GetGw2NoteFromMidi(int midiNoteNumber)
+        public static Gw2Note? GetGw2NoteFromMidi(int midiNoteNumber, bool restrictToTwoOctaves = false)
         {
             // MIDI Note 60 is C4 (Middle C)
             int noteInOctave = ((midiNoteNumber % 12) + 12) % 12; // ensure positive modulo
@@ -46,7 +46,7 @@ namespace Gw2MusicBot
 
             if (gw2Note.Octave < 1) gw2Note.Octave = 1;
             
-            if (ConfigManager.Config.KeyBinds.RestrictToTwoOctaves)
+            if (restrictToTwoOctaves)
             {
                 if (gw2Note.Octave > 2) gw2Note.Octave = 2;
             }
@@ -59,3 +59,4 @@ namespace Gw2MusicBot
         }
     }
 }
+

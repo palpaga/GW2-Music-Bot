@@ -25,10 +25,13 @@ namespace Gw2MusicBot
         private OutputDevice? _outputDevice;
         private int _currentOctave = 2; // GW2 Piano has 3 octaves. We start in the middle (2).
 
-
+        public bool IsPlaying => _cts != null && !_cts.IsCancellationRequested;
         public bool EnableGameInput { get; set; } = true;
 
-        public double PlaybackSpeed { get; set; } = 1.0;
+        public double PlaybackSpeed { get; set; } = 0.80;
+        public bool RestrictToTwoOctaves { get; set; } = false;
+        public int OctaveChangeDelayMs { get; set; } = 15;
+        public int SelectedTrackIndex { get; set; } = -1;
 
 
         public event EventHandler? PlaybackFinished;
@@ -47,6 +50,33 @@ namespace Gw2MusicBot
         {
             Stop();
             _midiFile = MidiFile.Read(filePath);
+        }
+
+        public List<string> GetTrackNames()
+        {
+            var names = new List<string>();
+            if (_midiFile == null) return names;
+
+            int i = 1;
+            foreach (var chunk in _midiFile.GetTrackChunks())
+            {
+                string trackName = $"Track {i}";
+                var sequenceNameEvent = chunk.Events.OfType<SequenceTrackNameEvent>().FirstOrDefault();
+                if (sequenceNameEvent != null && !string.IsNullOrWhiteSpace(sequenceNameEvent.Text))
+                {
+                    trackName += $" ({sequenceNameEvent.Text})";
+                }
+                
+                var noteCount = chunk.GetNotes().Count;
+                var uniquePrograms = chunk.Events.OfType<ProgramChangeEvent>().Select(p => p.ProgramNumber).Distinct().Count();
+                
+                trackName += $" - {noteCount} notes";
+                if (uniquePrograms > 0) trackName += $", {uniquePrograms} inst";
+                
+                names.Add(trackName);
+                i++;
+            }
+            return names;
         }
 
         public void Play()
@@ -69,15 +99,33 @@ namespace Gw2MusicBot
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
-            
-            // For preview listening only, we use the standard audio player
+
             if (_outputDevice != null)
             {
-                var audioPlayback = _midiFile.GetPlayback(_outputDevice);
+                Melanchall.DryWetMidi.Multimedia.Playback audioPlayback;
+                if (SelectedTrackIndex >= 0 && SelectedTrackIndex < _midiFile.GetTrackChunks().Count())
+                {
+                    var trackChunk = _midiFile.GetTrackChunks().ElementAt(SelectedTrackIndex);
+                    
+                    var tempMidi = new MidiFile();
+                    tempMidi.TimeDivision = _midiFile.TimeDivision; // Essential for timing
+                    
+                    if (_midiFile.GetTrackChunks().Count() > 1 && SelectedTrackIndex > 0) 
+                    {
+                        tempMidi.Chunks.Add(_midiFile.GetTrackChunks().First().Clone()); // Copy tempo/meta chunk safely
+                    }
+                    tempMidi.Chunks.Add(trackChunk.Clone());
+                    
+                    audioPlayback = tempMidi.GetPlayback(_outputDevice);
+                }
+                else
+                {
+                    audioPlayback = _midiFile.GetPlayback(_outputDevice);
+                }
+                
                 audioPlayback.Speed = PlaybackSpeed;
                 audioPlayback.Start();
-                
-                // Cleanup handled by Cancel
+
                 token.Register(() => {
                     audioPlayback.Stop();
                     audioPlayback.Dispose();
@@ -91,7 +139,13 @@ namespace Gw2MusicBot
             {
                 // 1. Parse the entire music to create a "Macro" (list of planned actions)
                 var tempoMap = _midiFile!.GetTempoMap();
-                var rawNotes = _midiFile.GetNotes()
+                IEnumerable<Melanchall.DryWetMidi.Interaction.Note> sourceNotes = _midiFile.GetNotes();
+                if (SelectedTrackIndex >= 0 && SelectedTrackIndex < _midiFile.GetTrackChunks().Count())
+                {
+                    sourceNotes = _midiFile.GetTrackChunks().ElementAt(SelectedTrackIndex).GetNotes();
+                }
+
+                var rawNotes = sourceNotes
                     .Select(n => new
                     {
                         TimeMs = (long)n.TimeAs<MetricTimeSpan>(tempoMap).TotalMilliseconds,
@@ -107,7 +161,7 @@ namespace Gw2MusicBot
                 int bestOffset = 0;
                 int minPenalty = int.MaxValue;
 
-                int maxAllowedOctave = ConfigManager.Config.KeyBinds.RestrictToTwoOctaves ? 2 : 3;
+                int maxAllowedOctave = RestrictToTwoOctaves ? 2 : 3;
 
                 // Test transpositions from -48 to +48 semitones (4 octaves up/down)
                 for (int i = -48; i <= 48; i++)
@@ -152,7 +206,7 @@ namespace Gw2MusicBot
                 // 2. Extract all notes allowing polyphony on the same octave
                 foreach (var rn in rawNotes)
                 {
-                    var gw2n = NoteMapper.GetGw2NoteFromMidi(rn.NoteNumber + transposeOffset);
+                    var gw2n = NoteMapper.GetGw2NoteFromMidi(rn.NoteNumber + transposeOffset, RestrictToTwoOctaves);
                     if (gw2n == null) continue; // Skip if it still falls on an unplayable accidental
 
                     noteEvents.Add(new Gw2NoteEvent
@@ -168,8 +222,14 @@ namespace Gw2MusicBot
 
                 if (EnableGameInput)
                 {
-                    // The user must ensure the instrument is on the middle octave (default on opening)
-                    _currentOctave = 2; 
+                    // "Blind Mode" initial reset:
+                    // Spam 6 times to ensure we drop down from page 5 (Major chords) to 1
+                    for (int i = 0; i < 6; i++)
+                    {
+                        InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveDown);
+                        Thread.Sleep(10);
+                    }
+                    _currentOctave = 1; 
                 }
 
                 // Group notes that are very close to form real chords
@@ -231,7 +291,8 @@ namespace Gw2MusicBot
                     {
                         int targetOctave = octGroup.Key;
 
-                        // 1. Sequential and safe octave change
+                        // Blind navigation to the target octave
+                        // We trust the game state: press keys and update _currentOctave accordingly.
                         while (_currentOctave != targetOctave)
                         {
                             if (token.IsCancellationRequested) break;
@@ -240,11 +301,6 @@ namespace Gw2MusicBot
                             {
                                 Stop();
                                 break;
-                            }
-
-                            if (ConfigManager.Config.KeyBinds.OctaveChangeDelayMs > 0)
-                            {
-                                Thread.Sleep(ConfigManager.Config.KeyBinds.OctaveChangeDelayMs);
                             }
 
                             if (targetOctave > _currentOctave)
@@ -257,20 +313,18 @@ namespace Gw2MusicBot
                                 InputSimulator.PressKey(ConfigManager.Config.KeyBinds.OctaveDown);
                                 _currentOctave--;
                             }
+
+                            if (OctaveChangeDelayMs > 0)
+                            {
+                                Thread.Sleep(OctaveChangeDelayMs);
+                            }
                         }
 
-                        // 2. Play all notes of the chord on this octave at the same time
+                        // 3. Play all notes of the chord on this octave at the same time
                         foreach (var note in octGroup)
                         {
                             InputSimulator.PressKey(note.KeyToPress);
                         }
-                    }
-
-                    // Add delay AFTER playing the entire chord (if configured)
-                    // This creates space before the next chord/note group starts
-                    if (ConfigManager.Config.KeyBinds.NoteDelayMs > 0)
-                    {
-                        Thread.Sleep(ConfigManager.Config.KeyBinds.NoteDelayMs);
                     }
                 }
 
@@ -300,3 +354,12 @@ namespace Gw2MusicBot
         }
     }
 }
+
+
+
+
+
+
+
+
+

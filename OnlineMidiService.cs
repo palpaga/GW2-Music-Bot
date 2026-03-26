@@ -13,14 +13,18 @@ namespace Gw2MusicBot
         public string Checksum { get; set; } = string.Empty;
         public string SourceUrl { get; set; } = string.Empty;
         public int Score { get; set; }
+        public double PlaybackSpeed { get; set; } = 1.0;
+        public bool RestrictToTwoOctaves { get; set; } = false;
+        public int OctaveChangeDelayMs { get; set; } = 15;
+        public int SelectedTrackIndex { get; set; } = -1;
     }
 
-    public class BardsGuildService
+    public class OnlineMidiService
     {
         private readonly HttpClient _client;
         private const string API_KEY = "0Tk-seyqLFwn5qCH2YzrYA";
 
-        public BardsGuildService()
+        public OnlineMidiService()
         {
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Add("User-Agent", "Gw2MusicBot");
@@ -77,31 +81,45 @@ namespace Gw2MusicBot
             return tracks;
         }
 
-        public async Task<string> DownloadMidiAsync(MidiTrackInfo track)
+        public async Task<string> DownloadMidiAsync(MidiTrackInfo track, bool isFavorite = false)
         {
             string downloadUrl = track.SourceUrl;
-            
+
             // If no source, we fallback to Bard's Guild Google Cloud CDN (like LuteBot)
             if (string.IsNullOrEmpty(downloadUrl))
             {
                 downloadUrl = $"https://storage.googleapis.com/bgml/mid/{track.Checksum}.mid";
             }
 
-            var response = await _client.GetAsync(downloadUrl);
-            response.EnsureSuccessStatusCode();
-            
+            string cacheDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Gw2MusicBot", "Cache");
             string tempDir = Path.Combine(Path.GetTempPath(), "Gw2MusicBot");
-            Directory.CreateDirectory(tempDir);
-            
+
             string safeName = string.Join("_", track.Name.Split(Path.GetInvalidFileNameChars()));
             if (!safeName.EndsWith(".mid", StringComparison.OrdinalIgnoreCase)) safeName += ".mid";
-            
-            string localPath = Path.Combine(tempDir, safeName);
-            
+
+            string localPath = isFavorite 
+                ? Path.Combine(cacheDir, $"{track.Checksum}_{safeName}")
+                : Path.Combine(tempDir, safeName);
+
+            if (isFavorite)
+            {
+                Directory.CreateDirectory(cacheDir);
+                if (File.Exists(localPath)) return localPath;
+            }
+            else
+            {
+                Directory.CreateDirectory(tempDir);
+            }
+
+            var response = await _client.GetAsync(downloadUrl);
+            response.EnsureSuccessStatusCode();
+
             var bytes = await response.Content.ReadAsByteArrayAsync();
             await File.WriteAllBytesAsync(localPath, bytes);
-            
+
             return localPath;
         }
     }
 }
+
+

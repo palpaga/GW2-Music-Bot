@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Text.Json;
 
 namespace Gw2MusicBot
@@ -12,38 +13,35 @@ namespace Gw2MusicBot
         public ushort OctaveUp { get; set; } = 0x30;   // 0
         public ushort StopPlayback { get; set; } = 0x1B; // ESC
         public bool DisableFunctionKeys { get; set; } = true;
-        public bool RestrictToTwoOctaves { get; set; } = false;
-        public int OctaveChangeDelayMs { get; set; } = 15;
-        public int NoteDelayMs { get; set; } = 0;
     }
 
     public class AppConfig
     {
+        public string Language { get; set; } = "en"; // Default language
         public List<MidiTrackInfo> Favorites { get; set; } = new List<MidiTrackInfo>();
         public KeyBindsConfig KeyBinds { get; set; } = new KeyBindsConfig();
     }
 
     public static class ConfigManager
     {
-        private static readonly string FilePath = "config.json";
+        private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Gw2MusicBot", "config.json");
 
         public static AppConfig Config { get; private set; } = new AppConfig();
 
         public static void Load()
         {
-            if (!File.Exists(FilePath) && File.Exists("favorites.json"))
+            // Migrate from old local path if it exists
+            if (!File.Exists(FilePath) && File.Exists("config.json"))
             {
                 try
                 {
-                    string oldJson = File.ReadAllText("favorites.json");
-                    var oldFavs = JsonSerializer.Deserialize<List<MidiTrackInfo>>(oldJson);
-                    if (oldFavs != null) Config.Favorites = oldFavs;
-                    Save();
-                    File.Delete("favorites.json");
+                    Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+                    File.Move("config.json", FilePath);
                 }
                 catch { }
             }
-            else if (File.Exists(FilePath))
+
+            if (File.Exists(FilePath))
             {
                 try
                 {
@@ -66,3 +64,8 @@ namespace Gw2MusicBot
         }
     }
 }
+
+
+
+
+
