@@ -2,6 +2,10 @@
 
 A standalone, modern desktop application that allows you to automatically play MIDI songs using the musical instruments in Guild Wars 2.
 
+<p align="center">
+  <img src="doc/imgs/window.png" alt="GW2 Music Bot Interface" width="400"/>
+</p>
+
 ## ✨ Features
 
 - **Online Search:** Find your favorite songs directly within the app using the [Bard's Guild API](https://bardsguild.life/).
