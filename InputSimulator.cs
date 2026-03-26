@@ -9,6 +9,12 @@ namespace Gw2MusicBot
         public static extern short GetAsyncKeyState(int vKey);
 
         [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [DllImport("user32.dll")]
         private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
         [DllImport("user32.dll")]
@@ -63,8 +69,31 @@ namespace Gw2MusicBot
         private const uint KEYEVENTF_SCANCODE = 0x0008;
         private const uint MAPVK_VK_TO_VSC = 0x00;
 
+        public static bool IsGw2Focused()
+        {
+            IntPtr hWnd = GetForegroundWindow();
+            if (hWnd == IntPtr.Zero) return false;
+
+            GetWindowThreadProcessId(hWnd, out uint processId);
+            try
+            {
+                using (var process = System.Diagnostics.Process.GetProcessById((int)processId))
+                {
+                    // GW2 executables are typically "Gw2-64" or "Gw2"
+                    return process.ProcessName.StartsWith("Gw2", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static void PressKey(ushort vkCode)
         {
+            // Safety measure: Only send keystrokes if GW2 is actually focused
+            if (!IsGw2Focused()) return;
+
             ushort scanCode = (ushort)MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
 
             INPUT[] inputs = new INPUT[2];

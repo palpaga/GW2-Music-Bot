@@ -222,6 +222,14 @@ namespace Gw2MusicBot
 
                 if (EnableGameInput)
                 {
+                    // Initial check to ensure we are actually in game before starting
+                    // We wait 3 seconds in MainWindow.xaml.cs before calling Play(), so the user should have tabbed back in by now.
+                    if (!InputSimulator.IsGw2Focused())
+                    {
+                        Stop();
+                        return; // Auto-cancel if user forgot to tab into the game
+                    }
+
                     // "Blind Mode" initial reset:
                     // Spam 6 times to ensure we drop down from page 5 (Major chords) to 1
                     for (int i = 0; i < 6; i++)
@@ -271,8 +279,8 @@ namespace Gw2MusicBot
                     {
                         if (token.IsCancellationRequested) break;
                         
-                        // Check for the user's global stop shortcut (e.g. Escape)
-                        if ((InputSimulator.GetAsyncKeyState(ConfigManager.Config.KeyBinds.StopPlayback) & 0x8000) != 0)
+                        // Check for the user's global stop shortcut (e.g. Escape) or if GW2 loses focus
+                        if ((InputSimulator.GetAsyncKeyState(ConfigManager.Config.KeyBinds.StopPlayback) & 0x8000) != 0 || (EnableGameInput && !InputSimulator.IsGw2Focused()))
                         {
                             Stop();
                             break;
