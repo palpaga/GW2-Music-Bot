@@ -43,6 +43,7 @@ namespace Gw2MusicBot
                     {"UpdateAvailable", "Update available: {0} ! Click here to download."},
                     {"PreviewStop", "⏹ Stop Preview"},
                     {"BtnStop", "⏹ STOP ({0})"},
+                    {"BtnPaused", "⏸ PAUSED - Focus GW2 or click Stop"},
                     {"DisclaimerTitle", "⚠️ DISCLAIMER & ARENANET POLICY"},
                     {"DisclaimerText", "While using macros specifically for playing musical instruments has historically been tolerated by ArenaNet, "},
                     {"DisclaimerBold", "you use this tool entirely at your own risk."},
@@ -86,6 +87,7 @@ namespace Gw2MusicBot
                     {"UpdateAvailable", "Mise à jour disponible : {0} ! Cliquez ici pour télécharger."},
                     {"PreviewStop", "⏹ Arrêter l'aperçu"},
                     {"BtnStop", "⏹ STOP ({0})"},
+                    {"BtnPaused", "⏸ EN PAUSE - remets GW2 au premier plan ou clique pour Stop"},
                     {"DisclaimerTitle", "⚠️ AVERTISSEMENTS & POLITIQUE ARENANET"},
                     {"DisclaimerText", "Bien que l'utilisation de macros spécifiques pour jouer des instruments ait été historiquement tolérée par ArenaNet, "},
                     {"DisclaimerBold", "vous utilisez cet outil à vos risques et périls."},
@@ -99,13 +101,13 @@ namespace Gw2MusicBot
         public static string T(string key, params object[] args)
         {
             string lang = _translations.ContainsKey(CurrentLanguage) ? CurrentLanguage : "en";
-            
+
             if (_translations[lang].TryGetValue(key, out string? value))
             {
                 return args.Length > 0 ? string.Format(value, args) : value;
             }
-            
-            return key; // Fallback to key if translation missing
+
+            return key;
         }
     }
 }

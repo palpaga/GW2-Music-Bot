@@ -79,8 +79,8 @@ namespace Gw2MusicBot
             {
                 using (var process = System.Diagnostics.Process.GetProcessById((int)processId))
                 {
-                    // GW2 executables are typically "Gw2-64" or "Gw2"
-                    return process.ProcessName.StartsWith("Gw2", StringComparison.OrdinalIgnoreCase);
+                    string pName = process.ProcessName.ToLowerInvariant();
+                    return pName == "gw2-64" || pName == "gw2";
                 }
             }
             catch

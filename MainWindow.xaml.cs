@@ -36,22 +36,21 @@ public partial class MainWindow : Window
         InitializeComponent();
         _player = new Gw2MidiPlayer();
         _midiService = new OnlineMidiService();
-        
+
         ConfigManager.Load();
         _favorites = ConfigManager.Config.Favorites;
 
-        // Initialize language dropdown
         if (ConfigManager.Config.Language == "fr")
             CmbLanguage.SelectedIndex = 1;
         else
             CmbLanguage.SelectedIndex = 0;
-            
+
         ApplyTranslations();
-        
         UpdateKeyBindUI();
-        
+
         _player.PlaybackFinished += (s, e) => Dispatcher.Invoke(() => ResetUI());
         _player.PlaybackStopped += (s, e) => Dispatcher.Invoke(() => ResetUI());
+        _player.PausedStateChanged += (s, e) => Dispatcher.Invoke(() => UpdatePlayButtonState());
     }
 
     private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -76,10 +75,10 @@ public partial class MainWindow : Window
         BtnSearch.Content = I18n.T("BtnSearch");
         BtnShowFavorites.Content = I18n.T("BtnFavorites");
         BtnLoadLocal.Content = I18n.T("BtnLocal");
-        
+
         GrpPlayerSettings.Header = I18n.T("PlayerSettings");
         TxtMidiTrackLabel.Text = I18n.T("MidiTrack");
-        
+
         if (!_isPreviewPlaying)
         {
             BtnPreviewTrack.Content = "▶ " + I18n.T("PreviewTrack");
@@ -90,7 +89,7 @@ public partial class MainWindow : Window
             BtnPreviewTrack.Content = I18n.T("PreviewStop");
             BtnPreviewTrack.Style = (Style)FindResource("DangerButton");
         }
-        
+
         ChkTwoOctaves.Content = I18n.T("RestrictOctaves");
         TxtTwoOctavesDesc.Text = I18n.T("RestrictOctavesDesc");
         TxtOctaveDelayLabel.Text = " | " + I18n.T("OctaveDelay");
@@ -98,16 +97,44 @@ public partial class MainWindow : Window
         ExpKeyMapping.Header = I18n.T("KeyMapping");
         ChkDisableFKeys.Content = I18n.T("DisableFKeys");
         TxtDisableFKeysDesc.Text = I18n.T("DisableFKeysDesc");
-        
+
         if (TxtFileName.Text == "No music selected" || TxtFileName.Text == "Aucune musique sélectionnée")
         {
             TxtFileName.Text = I18n.T("NoMusicSelected");
         }
-        
+
+        UpdatePlayButtonState();
+
+        TxtDisclaimerTitle.Text = I18n.T("DisclaimerTitle");
+        RunDisclaimerText1.Text = I18n.T("DisclaimerText");
+        RunDisclaimerBold.Text = I18n.T("DisclaimerBold");
+        RunDisclaimerEnd.Text = I18n.T("DisclaimerEnd");
+        RunDisclaimerLink.Text = I18n.T("DisclaimerLink");
+        RunDisclaimerLimitations.Text = I18n.T("DisclaimerLimitations");
+
+        if (CmbTracks.Items.Count > 0 && CmbTracks.Items[0] is string firstItem && (firstItem == "All Tracks (Merged)" || firstItem == "Toutes les Pistes (Fusionnées)"))
+        {
+            ApplyTrackSettingsToUI();
+        }
+    }
+
+    private void UpdatePlayButtonState()
+    {
         if (!_player.IsPlaying)
         {
             BtnPlay.Content = "▶ " + I18n.T("Play");
             BtnPlay.Style = (Style)FindResource("PrimaryButton");
+            GrpPlayerSettings.IsEnabled = true;
+            EnableTrackSettings(_currentTrack != null);
+            return;
+        }
+
+        GrpPlayerSettings.IsEnabled = false;
+
+        if (_player.IsPaused)
+        {
+            BtnPlay.Content = I18n.T("BtnPaused");
+            BtnPlay.Style = (Style)FindResource("AccentButton");
         }
         else
         {
@@ -115,30 +142,16 @@ public partial class MainWindow : Window
             BtnPlay.Content = I18n.T("BtnStop", stopKeyName);
             BtnPlay.Style = (Style)FindResource("DangerButton");
         }
-
-        // Traduction Footer
-        TxtDisclaimerTitle.Text = I18n.T("DisclaimerTitle");
-        RunDisclaimerText1.Text = I18n.T("DisclaimerText");
-        RunDisclaimerBold.Text = I18n.T("DisclaimerBold");
-        RunDisclaimerEnd.Text = I18n.T("DisclaimerEnd");
-        RunDisclaimerLink.Text = I18n.T("DisclaimerLink");
-        RunDisclaimerLimitations.Text = I18n.T("DisclaimerLimitations");
-        
-        // Refresh track combobox if populated
-        if (CmbTracks.Items.Count > 0 && CmbTracks.Items[0] is string firstItem && (firstItem == "All Tracks (Merged)" || firstItem == "Toutes les Pistes (Fusionnées)"))
-        {
-            ApplyTrackSettingsToUI(); 
-        }
     }
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "v1.0.0";
+        string currentVersion = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "v1.0.0";
         string tag = currentVersion.Split('+')[0];
         Title = $"{I18n.T("AppTitle")} ({tag})";
         await CheckForUpdatesAsync(tag);
     }
-    
+
     private async Task CheckForUpdatesAsync(string currentTag)
     {
         try
@@ -148,7 +161,7 @@ public partial class MainWindow : Window
             var response = await client.GetStringAsync("https://api.github.com/repos/palpaga/GW2-Music-Bot/releases/latest");
             using var doc = System.Text.Json.JsonDocument.Parse(response);
             string latestTag = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
-            
+
             if (!string.IsNullOrEmpty(latestTag) && latestTag != currentTag && !currentTag.StartsWith(latestTag))
             {
                 if (string.Compare(latestTag, currentTag) > 0)
@@ -165,7 +178,7 @@ public partial class MainWindow : Window
     private void UpdateKeyBindUI()
     {
         var binds = ConfigManager.Config.KeyBinds;
-        
+
         TxtNote0.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[0]).ToString();
         TxtNote1.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[1]).ToString();
         TxtNote2.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[2]).ToString();
@@ -178,12 +191,11 @@ public partial class MainWindow : Window
         TxtNote9.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[9]).ToString();
         TxtNote10.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[10]).ToString();
         TxtNote11.Text = KeyInterop.KeyFromVirtualKey(binds.Notes[11]).ToString();
-        
+
         TxtHighC.Text = KeyInterop.KeyFromVirtualKey(binds.HighC).ToString();
         TxtOctDown.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveDown).ToString();
         TxtOctUp.Text = KeyInterop.KeyFromVirtualKey(binds.OctaveUp).ToString();
         TxtStop.Text = KeyInterop.KeyFromVirtualKey(binds.StopPlayback).ToString();
-        
 
         ChkDisableFKeys.Checked -= ChkDisableFKeys_Changed;
         ChkDisableFKeys.Unchecked -= ChkDisableFKeys_Changed;
@@ -226,19 +238,23 @@ public partial class MainWindow : Window
                 CmbTracks.Items.Add(name);
             }
         }
-        
-        int selIndex = _currentTrack.SelectedTrackIndex + 1; // -1 becomes 0 (All Tracks)
-        if (selIndex >= 0 && selIndex < CmbTracks.Items.Count)
-        {
-            CmbTracks.SelectedIndex = selIndex;
-        }
-        else
-        {
-            CmbTracks.SelectedIndex = 0;
-        }
+
+        int selectedIndex = _currentTrack.SelectedTrackIndex + 1;
+        CmbTracks.SelectedIndex = selectedIndex >= 0 && selectedIndex < CmbTracks.Items.Count ? selectedIndex : 0;
         CmbTracks.SelectionChanged += CmbTracks_SelectionChanged;
 
         _isUpdatingUI = false;
+        ApplyCurrentTrackSettingsToPlayer();
+    }
+
+    private void ApplyCurrentTrackSettingsToPlayer()
+    {
+        if (_currentTrack == null) return;
+
+        _player.PlaybackSpeed = _currentTrack.PlaybackSpeed;
+        _player.RestrictToTwoOctaves = _currentTrack.RestrictToTwoOctaves;
+        _player.OctaveChangeDelayMs = _currentTrack.OctaveChangeDelayMs;
+        _player.SelectedTrackIndex = _currentTrack.SelectedTrackIndex;
     }
 
     private void SaveTrackSetting()
@@ -247,7 +263,7 @@ public partial class MainWindow : Window
 
         _currentTrack.PlaybackSpeed = SliderSpeed.Value;
         _currentTrack.RestrictToTwoOctaves = ChkTwoOctaves.IsChecked == true;
-        
+
         if (int.TryParse(TxtOctaveDelay.Text, out int octDelay) && octDelay >= 0)
         {
             _currentTrack.OctaveChangeDelayMs = octDelay;
@@ -255,17 +271,10 @@ public partial class MainWindow : Window
 
         if (CmbTracks.SelectedIndex >= 0)
         {
-            _currentTrack.SelectedTrackIndex = CmbTracks.SelectedIndex - 1; // 0 (All Tracks) becomes -1
+            _currentTrack.SelectedTrackIndex = CmbTracks.SelectedIndex - 1;
         }
 
-        if (_player != null)
-        {
-            _player.PlaybackSpeed = _currentTrack.PlaybackSpeed;
-            _player.RestrictToTwoOctaves = _currentTrack.RestrictToTwoOctaves;
-            _player.OctaveChangeDelayMs = _currentTrack.OctaveChangeDelayMs;
-            _player.SelectedTrackIndex = _currentTrack.SelectedTrackIndex;
-        }
-
+        ApplyCurrentTrackSettingsToPlayer();
         ConfigManager.Save();
     }
 
@@ -321,11 +330,12 @@ public partial class MainWindow : Window
                 {
                     _favorites.Add(track);
                 }
+
                 btn.Foreground = Brushes.Orange;
             }
+
             ConfigManager.Save();
-            
-            // If we are on the favorites tab, refresh
+
             if (LstResults.ItemsSource == _favorites)
             {
                 LstResults.ItemsSource = null;
@@ -343,24 +353,23 @@ public partial class MainWindow : Window
 
     private void BtnPreviewTrack_Click(object sender, RoutedEventArgs e)
     {
-        if (_currentTrack != null)
-        {
-            if (_isPreviewPlaying)
-            {
-                _player.Stop();
-                ResetPreviewButtonUI();
-                return;
-            }
+        if (_currentTrack == null) return;
 
+        if (_isPreviewPlaying)
+        {
             _player.Stop();
-            
-            _isPreviewPlaying = true;
-            BtnPreviewTrack.Content = I18n.T("PreviewStop");
-            BtnPreviewTrack.Style = (Style)FindResource("DangerButton");
-            
-            _player.EnableGameInput = false;
-            _player.PlayAudioPreviewOnly();
+            ResetPreviewButtonUI();
+            return;
         }
+
+        _player.Stop();
+
+        _isPreviewPlaying = true;
+        BtnPreviewTrack.Content = I18n.T("PreviewStop");
+        BtnPreviewTrack.Style = (Style)FindResource("DangerButton");
+
+        _player.EnableGameInput = false;
+        _player.PlayAudioPreviewOnly();
     }
 
     private async void LstResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -406,14 +415,14 @@ public partial class MainWindow : Window
             try
             {
                 _player.LoadFile(openFileDialog.FileName);
-                
+
                 _currentTrack = new MidiTrackInfo { Name = System.IO.Path.GetFileName(openFileDialog.FileName) };
                 EnableTrackSettings(true);
                 ApplyTrackSettingsToUI();
 
                 TxtFileName.Text = I18n.T("Ready", _currentTrack.Name);
 
-                LstResults.SelectedItem = null; // Deselect online list
+                LstResults.SelectedItem = null;
                 BtnPlay.IsEnabled = true;
             }
             catch (Exception ex)
@@ -433,32 +442,28 @@ public partial class MainWindow : Window
         }
 
         BtnPlay.IsEnabled = false;
-        
-        // Countdown from 3
+
         for (int i = 3; i > 0; i--)
         {
             BtnPlay.Content = I18n.T("PlayingIn", i);
             await Task.Delay(1000);
         }
-        
-        string stopKeyName = KeyInterop.KeyFromVirtualKey(ConfigManager.Config.KeyBinds.StopPlayback).ToString();
-        BtnPlay.Content = I18n.T("BtnStop", stopKeyName);
-        BtnPlay.Style = (Style)FindResource("DangerButton");
+
         BtnPlay.IsEnabled = true;
-        
+
         _player.EnableGameInput = true;
         _player.Play();
+        UpdatePlayButtonState();
     }
 
     private void ResetUI()
     {
-        BtnPlay.Content = "▶ " + I18n.T("Play");
-        BtnPlay.Style = (Style)FindResource("PrimaryButton");
         BtnPlay.IsEnabled = true;
-        
         ResetPreviewButtonUI();
-        
+
         if (_player != null) _player.EnableGameInput = true;
+
+        UpdatePlayButtonState();
     }
 
     private void SliderSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -467,10 +472,12 @@ public partial class MainWindow : Window
         {
             _player.PlaybackSpeed = e.NewValue;
         }
+
         if (TxtSpeedVal != null)
         {
             TxtSpeedVal.Text = $"{e.NewValue:F2}x";
         }
+
         SaveTrackSetting();
     }
 
@@ -481,7 +488,7 @@ public partial class MainWindow : Window
         {
             Key key = e.Key == Key.System ? e.SystemKey : e.Key;
             ushort vk = (ushort)KeyInterop.VirtualKeyFromKey(key);
-            
+
             tb.Text = key.ToString();
 
             if (tag.StartsWith("Note_"))
@@ -522,10 +529,16 @@ public partial class MainWindow : Window
     }
 }
 
-public partial class MainWindow {
-    private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+public partial class MainWindow
+{
+    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
     {
-        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); } catch { }
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        }
+        catch { }
+
         e.Handled = true;
     }
 }
