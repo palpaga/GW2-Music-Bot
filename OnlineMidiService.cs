@@ -13,9 +13,9 @@ namespace Gw2MusicBot
         public string Checksum { get; set; } = string.Empty;
         public string SourceUrl { get; set; } = string.Empty;
         public int Score { get; set; }
-        public double PlaybackSpeed { get; set; } = 1.0;
+        public double PlaybackSpeed { get; set; } = 0.85;
         public bool RestrictToTwoOctaves { get; set; } = false;
-        public int OctaveChangeDelayMs { get; set; } = 15;
+        public int OctaveChangeDelayMs { get; set; } = 0;
         public int SelectedTrackIndex { get; set; } = -1;
     }
 
